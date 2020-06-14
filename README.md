@@ -22,7 +22,7 @@ make
 ## Usage
 Inside the directory of the binary, simply :
 ``` bash
-wsignal [WIRELESS INTERFACE]
+wpower [WIRELESS INTERFACE]
 ```
 ## License
 The software provided above is licensed under the [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.en.html).
