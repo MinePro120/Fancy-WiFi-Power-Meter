@@ -1,2 +1,2 @@
-wsignal : wsignal.c
-	gcc -w -O2 wsignal.c -o wsignal
+wpower : wpower.c
+	gcc -w -O2 wpower.c -o wpower
