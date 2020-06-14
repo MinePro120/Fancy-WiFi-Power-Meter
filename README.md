@@ -1,8 +1,10 @@
 # Fancy Wi-Fi Power Meter
-<a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.en.html" title="License: GPL v3"><img src="https://img.shields.io/badge/License:-GPL%20v3-darkred.svg" align=center></a>
-
- <img src="https://i.imgur.com/7KC3SzI.png" align=center> 
-
+<p align=center>
+<a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.en.html" title="License: GPL v3">
+<img src="https://img.shields.io/badge/License:-GPL%20v3-darkred.svg">
+</a>
+<img src="https://i.imgur.com/7KC3SzI.png"> 
+</p>
 Fancy Wi-Fi Power Meter is a fancy cli tool to measure the received signal power (or RSSI) of a wireless  (Wi-Fi)  network you are connected to.
 
 ## Dependencies
