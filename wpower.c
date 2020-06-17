@@ -2,59 +2,70 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 
 
-void printLogo ()
+void handleSignal ()
 {
-  printf ("\e[1;34m __      ___     ___ _   ___                      __  __     _\n");
-  printf (" \\ \\    / (_)___| __(_) | _ \\_____ __ _____ _ _  |  \\/  |___| |_ ___ _ _\n");
-  printf ("  \\ \\/\\/ /| |___| _|| | |  _/ _ \\ V  V / -_) '_| | |\\/| / -_)  _/ -_) '_|\n");
-  printf ("   \\_/\\_/ |_|   |_| |_| |_| \\___/\\_/\\_/\\___|_|   |_|  |_\\___|\\__\\___|_|\n\e[0m");
+  printf ("\033c");
+  exit (0);
 }
 
 
-void printPower (int power)
+void printLogo (char *buf)
 {
-  printf ("\e[1;32m");
+  char tempStr[500];
+  strcpy (tempStr, "\e[1;34m\n __      ___     ___ _   ___                      __  __     _\n");
+  strcat (tempStr, " \\ \\    / (_)___| __(_) | _ \\_____ __ _____ _ _  |  \\/  |___| |_ ___ _ _\n");
+  strcat (tempStr, "  \\ \\/\\/ /| |___| _|| | |  _/ _ \\ V  V / -_) '_| | |\\/| / -_)  _/ -_) '_|\n");
+  strcat (tempStr, "   \\_/\\_/ |_|   |_| |_| |_| \\___/\\_/\\_/\\___|_|   |_|  |_\\___|\\__\\___|_|\n\n\e[0m");
+  strcat (buf, tempStr);
+}
+
+
+void printPower (int power, char *buf)
+{
+  char tempStr[200] = "\e[1;32m";
   if (power >= -20)
     {
-      printf ("                         __\n");
-      printf ("                      __|  |\n");
-      printf (" ,--..Y            __|  |  |\n");
-      printf (" \\   /`.        __|  |  |  |\n");
-      printf ("  \\.    \\    __|  |  |  |  |\n");
-      printf ("   \"\"\"--'   |  |  |  |  |  |\n");
+      strcat (tempStr, "                         __\n");
+      strcat (tempStr, "                      __|  |\n");
+      strcat (tempStr, " ,--..Y            __|  |  |\n");
+      strcat (tempStr, " \\   /`.        __|  |  |  |\n");
+      strcat (tempStr, "  \\.    \\    __|  |  |  |  |\n");
+      strcat (tempStr, "   \"\"\"--'   |  |  |  |  |  |");
     }
   else if (power >= -40)
     {
-      printf ("                      __\n");
-      printf (" ,--..Y            __|  |\n");
-      printf (" \\   /`.        __|  |  |\n");
-      printf ("  \\.    \\    __|  |  |  |\n");
-      printf ("   \"\"\"--'   |  |  |  |  |\n");
+      strcat (tempStr, "                      __\n");
+      strcat (tempStr, " ,--..Y            __|  |\n");
+      strcat (tempStr, " \\   /`.        __|  |  |\n");
+      strcat (tempStr, "  \\.    \\    __|  |  |  |\n");
+      strcat (tempStr, "   \"\"\"--'   |  |  |  |  |");
     }
   else if (power >= -60)
     {
-      printf (" ,--..Y            __\n");
-      printf (" \\   /`.        __|  |\n");
-      printf ("  \\.    \\    __|  |  |\n");
-      printf ("   \"\"\"--'   |  |  |  |\n");
+      strcat (tempStr, " ,--..Y            __\n");
+      strcat (tempStr, " \\   /`.        __|  |\n");
+      strcat (tempStr, "  \\.    \\    __|  |  |\n");
+      strcat (tempStr, "   \"\"\"--'   |  |  |  |");
     }
   else if (power >= -80)
     {
-      printf (" ,--..Y\n");
-      printf (" \\   /`.        __\n");
-      printf ("  \\.    \\    __|  |\n");
-      printf ("   \"\"\"--'   |  |  |\n");
+      strcat (tempStr, " ,--..Y\n");
+      strcat (tempStr, " \\   /`.        __\n");
+      strcat (tempStr, "  \\.    \\    __|  |\n");
+      strcat (tempStr, "   \"\"\"--'   |  |  |");
     }
   else
     {
-      printf (" ,--..Y\n");
-      printf (" \\   /`.\n");
-      printf ("  \\.    \\    __\n");
-      printf ("   \"\"\"--'   |  |\n");
+      strcat (tempStr, " ,--..Y\n");
+      strcat (tempStr, " \\   /`.\n");
+      strcat (tempStr, "  \\.    \\    __\n");
+      strcat (tempStr, "   \"\"\"--'   |  |");
     }
-  printf ("\e[0m");
+  strcat (tempStr, "\e[0m\n");
+  strcat (buf, tempStr);
 }
 
 
@@ -71,32 +82,43 @@ void checkNic (char *nic)
 }
 
 
-void printEssid (char *nic)
+void printEssid (char *nic, char *buf)
 {
   char str[100] = "iwgetid | grep -w ";
   strcat (str, nic);
   strcat (str, " | egrep -o '\"(.*?)\"'");
-  printf ("\e[1;33m ESSID : ");
-  fflush (stdout);
-  system (str);
-  printf ("\e[0m");
+  FILE *fp;
+  fp = popen (str, "r");
+  char essid[34];
+  fgets (essid, sizeof (essid), fp);
+  pclose (fp);
+  char tempStr[50];
+  sprintf (tempStr, "\e[1;33m ESSID : %s\e[0m", essid);
+  strcat (buf, tempStr);
 }
 
 
-printRssi (char *nic, char str[])
+void printRssi (char *nic, char *buf)
 {
-  strcpy (str, "cat /proc/net/wireless | grep -w ");
+  char str[100] = "cat /proc/net/wireless | grep -w ";
   strcat (str, nic);
   strcat (str, " | cut -d ' ' -f 7 | cut -z -c 1-3");
-  printf ("\e[1;33m RSSI : ");
-  fflush (stdout);
-  system (str);
-  printf (" dBm\n\n\e[0m");
+  FILE *fp;
+  fp = popen (str, "r");
+  char rssi[4];
+  fgets (rssi, sizeof (rssi), fp);
+  pclose (fp);
+  char tempStr[50];
+  sprintf (tempStr, "\e[1;33m RSSI : %s dBm\n\n\e[0m", rssi);
+  strcat (buf, tempStr);
+  printPower (atoi (rssi), buf);
 }
 
 
 int main (int argc, char **argv)
 {
+  signal (SIGINT, handleSignal);
+  signal (SIGQUIT, handleSignal);
   if (argc != 2)
     {
       fprintf (stderr, "\e[1;31mUsage : wpower [WIRELESS INTERFACE]\n\e[0m");
@@ -105,24 +127,17 @@ int main (int argc, char **argv)
   checkNic (argv[1]);
   while (1)
     {
-      printf ("\033c");
-      putchar ('\n');
-      printLogo ();
-      putchar ('\n');
-      printf ("\e[1;33m Interface : %s\n\e[0m", argv[1]);
-      fflush (stdout);
-      printEssid (argv[1]);
-      FILE *fp;
-      char str[100];
-      printRssi (argv[1], str);
-      fp = popen (str, "r");    // Stores RSSI as int
-      char powerString[4];
-      fgets (powerString, sizeof (powerString), fp);
-      pclose (fp);
-      int power = atoi (powerString);
-      printPower (power);
+      char buf[500] = "";    // Output buffer
+      printLogo (buf);
+      char tempStr[50] = "";
+      sprintf (tempStr, "\e[1;33m Interface : %s\n\e[0m", argv[1]);
+      strcat (buf, tempStr);
+      printEssid (argv[1], buf);
+      printRssi (argv[1], buf);
+      checkNic (argv[1]);    // Check if NIC is still up
+      printf ("\033c");    // Clear screen
+      printf (buf);    // Print everything
       sleep (1);    // Refresh delay
-      checkNic (argv[1]);    // Checks if NIC is still up
     }
   exit (0);
 }
