@@ -15,7 +15,7 @@ It should work out of the box in most GNU/Linux distributions, but here are the 
 * iwgetid
 * grep
 
-## Compile
+## Build
 ``` bash
 make
 ```
