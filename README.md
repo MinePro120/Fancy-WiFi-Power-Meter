@@ -6,7 +6,7 @@
 <br>
 <img src="https://i.imgur.com/7KC3SzI.png"> 
 </p>
-Fancy Wi-Fi Power Meter is a fancy cli tool to measure the received signal power (or RSSI) of a wireless  (Wi-Fi)  network you are connected to.
+Fancy Wi-Fi Power Meter is a fancy cli tool to measure the received signal power (RSSI) of a wireless  (Wi-Fi)  network you are connected to.
 
 ## Dependencies
 It should work out of the box in most GNU/Linux distributions, but here are the dependencies :
