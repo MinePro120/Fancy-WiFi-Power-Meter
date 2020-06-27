@@ -50,18 +50,22 @@ void printRssi (char *nic, char *buf)
   strcat (str, nic);
   strcat (str, " | cut -z -d '.' -f 2");
   FILE *fp;
-  fp = popen (str, "r");
-  char powerStr[10];
-  fgets (powerStr, sizeof (powerStr), fp);
-  pclose (fp);
-  char tempStr[400];
-  int power = atoi (powerStr);
+  fp = popen (str, "r");    // fetch power
+  fgets (str, sizeof (str), fp);    // str gets recycled
+  int power = atoi (str);
   static unsigned long long int sum = 0;
   sum += -power;
-  float avg = (float) sum / counter;
-  sprintf (tempStr, "\e[1;93m Power : %d dBm (-%1.1f avg.)\n\n\e[0m", power, avg);
+  float avg = (float) sum / counter;    // calculate average
+  char tempStr[400];
+  sprintf (tempStr, "\e[1;93m Power : %d dBm (-%1.1f avg.)\n\e[0m", power, avg);
   strcat (buf, tempStr);
-  //printPower (rssi, buf);
+  strcpy (str, "ping google.com -c 1 > /dev/null 2>&1; echo $?");
+  fp = popen (str, "r");    // fetch internet status
+  fgets (str, sizeof (str), fp);
+  pclose (fp);
+  char *internetStatus = !atoi (str) ? "Yes" : "No";
+  sprintf (tempStr, "\e[1;93m Internet Connection: %s\n\e[0m", internetStatus);
+  strcat (buf, tempStr);
   strcpy (tempStr, "");
   if (power >= -30)    // Print ascii art
     {
