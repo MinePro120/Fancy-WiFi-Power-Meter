@@ -30,11 +30,10 @@ void checkNic (char *nic)
 
 void printEssid (char *nic, char *buf)
 {
-  char str[100] = "iwgetid | grep -w ";
-  strcat (str, nic);
-  strcat (str, " | grep -E -o '\"(.*?)\"'");
+  char str[100];
+  sprintf (str, "iwgetid | grep -w %s | grep -E -o '\"(.*?)\"'", nic);
   FILE *fp;
-  fp = popen (str, "r");
+  fp = popen (str, "r");    // fetch essid
   char essid[34];
   fgets (essid, sizeof (essid), fp);
   pclose (fp);
@@ -46,9 +45,8 @@ void printEssid (char *nic, char *buf)
 
 void printRssi (char *nic, char *buf)
 {
-  char str[100] = "cat /proc/net/wireless | grep -w ";
-  strcat (str, nic);
-  strcat (str, " | cut -z -d '.' -f 2");
+  char str[100];
+  sprintf (str, "cat /proc/net/wireless | grep -w %s | cut -z -d '.' -f 2", nic);
   FILE *fp;
   fp = popen (str, "r");    // fetch power
   fgets (str, sizeof (str), fp);    // str gets recycled
@@ -59,12 +57,12 @@ void printRssi (char *nic, char *buf)
   char tempStr[400];
   sprintf (tempStr, "\e[1;93m Power : %d dBm (-%1.1f avg.)\n\e[0m", power, avg);
   strcat (buf, tempStr);
-  strcpy (str, "ping google.com -c 1 > /dev/null 2>&1; echo $?");
+  sprintf (str, "ping -c 1 -W 1 -I %s google.com > /dev/null 2>&1 ; echo $?", nic);
   fp = popen (str, "r");    // fetch internet status
   fgets (str, sizeof (str), fp);
   pclose (fp);
   char *internetStatus = !atoi (str) ? "Yes" : "No";
-  sprintf (tempStr, "\e[1;93m Internet Connection: %s\n\e[0m", internetStatus);
+  sprintf (tempStr, "\e[1;93m Internet Connection : %s\n\e[0m", internetStatus);
   strcat (buf, tempStr);
   strcpy (tempStr, "");
   if (power >= -30)    // Print ascii art
