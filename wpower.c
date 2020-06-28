@@ -32,8 +32,7 @@ void printEssid (char *nic, char *buf)
 {
   char str[100];
   sprintf (str, "iwgetid | grep -w %s | grep -E -o '\"(.*?)\"'", nic);
-  FILE *fp;
-  fp = popen (str, "r");    // fetch essid
+  FILE *fp = popen (str, "r");    // Fetch essid
   char essid[34];
   fgets (essid, sizeof (essid), fp);
   pclose (fp);
@@ -47,18 +46,18 @@ void printRssi (char *nic, char *buf)
 {
   char str[100];
   sprintf (str, "cat /proc/net/wireless | grep -w %s | cut -z -d '.' -f 2", nic);
-  FILE *fp;
-  fp = popen (str, "r");    // fetch power
+  FILE *fp = popen (str, "r");    // Fetch power
   fgets (str, sizeof (str), fp);    // str gets recycled
+  pclose (fp);
   int power = atoi (str);
   static unsigned long long int sum = 0;
   sum += -power;
-  float avg = (float) sum / counter;    // calculate average
+  float avg = (float) sum / counter;    // Calculate average
   char tempStr[400];
   sprintf (tempStr, "\e[1;93m Power : %d dBm (-%1.1f avg.)\n\e[0m", power, avg);
   strcat (buf, tempStr);
   sprintf (str, "ping -c 1 -W 1 -I %s google.com > /dev/null 2>&1 ; echo $?", nic);
-  fp = popen (str, "r");    // fetch internet status
+  fp = popen (str, "r");    // Fetch internet status
   fgets (str, sizeof (str), fp);
   pclose (fp);
   char *internetStatus = !atoi (str) ? "Yes" : "No";
@@ -110,7 +109,7 @@ void printRssi (char *nic, char *buf)
       strcat (tempStr, "\e[1;92m  \\.    \\    __\e[1;90m|  |  |  |  |\n");
       strcat (tempStr, "\e[1;92m   \"\"\"--'   |  |\e[1;90m  |  |  |  |");
     }
-  strcat (tempStr, "\e[0m\n");
+  strcat (tempStr, "\e[0m");
   strcat (buf, tempStr);
 }
 
@@ -124,7 +123,7 @@ int main (int argc, char **argv)
       fprintf (stderr, "\e[1;91mUsage : wpower [WIRELESS INTERFACE]\n\e[0m");
       exit (1);
     }
-  const char logo[] = "\e[1;94m\n __      ___     ___ _   ___                      __  __     _\n"
+  const char logo[] = "\e[1;94m __      ___     ___ _   ___                      __  __     _\n"
   " \\ \\    / (_)___| __(_) | _ \\_____ __ _____ _ _  |  \\/  |___| |_ ___ _ _\n"
   "  \\ \\/\\/ /| |___| _|| | |  _/ _ \\ V  V / -_) '_| | |\\/| / -_)  _/ -_) '_|\n"
   "   \\_/\\_/ |_|   |_| |_| |_| \\___/\\_/\\_/\\___|_|   |_|  |_\\___|\\__\\___|_|\n\n\e[0m";
@@ -140,7 +139,7 @@ int main (int argc, char **argv)
       checkNic (argv[1]);    // Check if NIC is still up
       strcpy (outBuf, logo);
       system ("clear");    // Clear screen
-      printf (strcat (outBuf, infoBuf));    // Print everything
+      puts (strcat (outBuf, infoBuf));    // Print everything
       sleep (1);    // Refresh delay
       counter++;
     }
