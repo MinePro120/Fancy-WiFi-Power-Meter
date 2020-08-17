@@ -3,12 +3,16 @@
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
+#include <termio.h>
 
 unsigned long long int counter = 1;
+struct termio term, oldTerm;
 
 
 void handleSignal ()
 {
+  printf("\e[?25h");    // Enable cursor
+  ioctl(0, TCSETA, &oldTerm);    // Reset terminal
   system ("clear");
   exit (0);
 }
@@ -36,9 +40,8 @@ void printEssid (char *nic, char *buf)
   char essid[34];
   fgets (essid, sizeof (essid), fp);
   pclose (fp);
-  char tempStr[50];
-  sprintf (tempStr, "\e[1;93m ESSID : %s\e[0m", essid);
-  strcat (buf, tempStr);
+  sprintf (str, "\e[1;93m ESSID : %s\e[0m", essid);
+  strcat (buf, str);
 }
 
 
@@ -56,7 +59,7 @@ void printRssi (char *nic, char *buf)
   char tempStr[400];
   sprintf (tempStr, "\e[1;93m Power : %d dBm (-%1.1f avg.)\n\e[0m", power, avg);
   strcat (buf, tempStr);
-  sprintf (str, "ping -c 1 -W 1 -I %s google.com > /dev/null 2>&1 ; echo $?", nic);
+  sprintf (str, "ping -c 1 -w 1 -I %s google.com > /dev/null 2>&1 ; echo $?", nic);
   fp = popen (str, "r");    // Fetch internet status
   fgets (str, sizeof (str), fp);
   pclose (fp);
@@ -116,6 +119,13 @@ void printRssi (char *nic, char *buf)
 
 int main (int argc, char **argv)
 {
+  printf("\e[?25l");    // Hide cursor
+  ioctl(0, TCGETA, &oldTerm);    // Disable echo
+  term = oldTerm;
+  term.c_lflag    &= ~(ICANON|ECHO|ECHOE|ECHOK|ECHONL);
+  term.c_cc[VMIN]  = 1;
+  term.c_cc[VTIME] = 0;
+  ioctl(0, TCSETA, &term);
   signal (SIGINT, handleSignal);
   signal (SIGQUIT, handleSignal);
   if (argc != 2)
