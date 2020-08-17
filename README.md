@@ -25,5 +25,6 @@ Inside the directory of the binary, simply :
 ``` bash
 ./wpower [WIRELESS INTERFACE]
 ```
+It may require root privileges is some distributions.
 ## License
 The software provided above is licensed under the [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.en.html).
