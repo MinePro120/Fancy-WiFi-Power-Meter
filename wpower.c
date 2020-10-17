@@ -27,6 +27,8 @@ void checkNic (char *nic)
     {
       system ("clear");
       fprintf (stderr, "\e[0m\e[1;91mNo such wireless interface/Disconnected\n\e[0m");
+      printf("\e[?25h");    // Enable cursor
+      ioctl(0, TCSETA, &oldTerm);    // Reset terminal
       exit (1);
     }
 }
