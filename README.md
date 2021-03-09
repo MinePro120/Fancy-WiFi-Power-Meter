@@ -1,5 +1,5 @@
 # Fancy Wi-Fi Power Meter
-<p align=left>
+<p align="left">
 <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.en.html" title="License: GPL v3">
 <img src="https://img.shields.io/badge/License:-GPL%20v3-darkred.svg">
 </a>
